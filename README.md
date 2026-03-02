@@ -1,100 +1,136 @@
-# ANTLR
+# Calculadora ANTLR – Capítulo 4
+---
 
-## Una mini-calculadora que soporte:
+# 1. Objetivo
 
-- Expresiones con + - * / y paréntesis
+Implementar la calculadora presentada en el Capítulo 4 utilizando ANTLR como generador de analizadores sintácticos y Java como lenguaje objetivo, y documentar el proceso completo de instalación, generación de código, compilación y ejecución.
 
-- Asignaciones: a = 3+4
+---
 
-- Uso de variables: a*2
+# 2. Entorno de Desarrollo
 
-- Cada sentencia termina en NEWLINE
+- Sistema operativo: Ubuntu (Máquina Virtual)
+- Java: OpenJDK 17
+- ANTLR: 4.13.1
+- Terminal Linux
 
-- Imprime el valor de cada sentencia (como en el tour del cap. 4)
+---
 
-## Ejemplo de entrada:
+# 3. Verificación de Java
+
+Se verifica la instalación de Java:
+
+```bash
+java -version
+```
+<img width="804" height="193" alt="Captura de pantalla 2026-03-01 230521" src="https://github.com/user-attachments/assets/4a4ad7ab-496b-4742-ab04-4e2ccfe2a5e1" />
+
+# 4. Descarga de ANTLR
+
+- Se descarga el archivo:
+```
+antlr-4.13.1-complete.jar
+```
+Verificación con:
+```
+ls
+```
+<img width="801" height="140" alt="Captura de pantalla 2026-03-01 231503" src="https://github.com/user-attachments/assets/4c72d484-628b-465b-90f0-b802832528f0" />
+
+# 5. Creación del Proyecto
+
+- Se crea la carpeta del proyecto:
+
+```
+mkdir antlr_calculadora
+cd antlr_calculadora
+```
+<img width="807" height="92" alt="Captura de pantalla 2026-03-01 231551" src="https://github.com/user-attachments/assets/174b2670-1e7e-48ab-a950-ada1c9fc9d25" />
+
+# 6. Gramática Expr.g4
+
+Se crea el archivo Expr.g4 con la siguiente gramática:
+
+<img width="802" height="462" alt="Captura de pantalla 2026-03-01 231617" src="https://github.com/user-attachments/assets/8adf037d-fb8a-4a3f-b88d-d81b37b86425" />
+
+# 7. Generación del Parser y Visitor
+
+Se ejecuta:
+```
+java -jar ../antlr-4.13.1-complete.jar -visitor Expr.g4
+```
+
+## Esto genera automáticamente:
+
+ExprLexer.java
+
+ExprParser.java
+
+ExprBaseVisitor.java
+
+ExprVisitor.java
+
+Archivos .tokens y .interp
+<img width="806" height="377" alt="Captura de pantalla 2026-03-01 231655" src="https://github.com/user-attachments/assets/c2c0145f-a589-4e4e-addd-f2d2d2b2ca9e" />
+
+# 8. Implementación del EvalVisitor
+
+- Archivo: EvalVisitor.java
+
+- Este archivo extiende ExprBaseVisitor<Integer> y se encarga de evaluar el árbol sintáctico.
+
+## Funciones principales:
+
+- visitAssign → Guarda variables
+
+- visitPrintExpr → Imprime resultados
+
+- visitMulDiv → Multiplicación y división
+
+- visitAddSub → Suma y resta
+
+<img width="802" height="460" alt="Captura de pantalla 2026-03-01 231727" src="https://github.com/user-attachments/assets/17f5f224-273a-4581-a805-e82f1ec85e94" />
+
+# 9. Implementación del Main
+
+- Archivo: Main.java
+
+## Este archivo:
+
+- Lee la entrada del usuario
+
+- Crea el Lexer
+
+- Crea el Parser
+
+- Construye el árbol
+
+- Ejecuta el Visitor
+<img width="804" height="410" alt="Captura de pantalla 2026-03-01 231754" src="https://github.com/user-attachments/assets/0671a179-15b9-486c-be22-e6ab35338c5b" />
+
+# 10. Compilación
+
+Se compila con:
+```
+javac -cp ".:../antlr-4.13.1-complete.jar" *.java
+```
+# 11. Ejecución
+
+Se ejecuta con:
+```
+java -cp ".:../antlr-4.13.1-complete.jar" Main
+```
+Prueba realizada:
 ```
 a=5
-b=6
-a+b*2
-(1+2)*3
+b=2
+a+b*3
 ```
-Salida esperada (aprox):
+Resultado:
+```
+11
+```
+<img width="808" height="234" alt="Captura de pantalla 2026-03-01 232036" src="https://github.com/user-attachments/assets/b0111605-b69a-4c9c-9ae5-e28a9cb73ec9" />
 
-5
-6
-17
-9
-1) Preparación del entorno en WSL (Ubuntu)
-1.1 Java (JDK)
-sudo apt update
-sudo apt install openjdk-17-jdk -y
-java -version
-1.2 Descargar ANTLR jar
-cd ~
-curl -O https://www.antlr.org/download/antlr-4.13.1-complete.jar
-1.3 Crear alias antlr4 y grun (TestRig)
 
-Tus diapositivas muestran esta idea de alias para no escribir todo el comando (se ve en la parte de “Instalación” / alias). 
 
-04_LP
-
-nano ~/.bashrc
-
-Al final pega:
-
-export CLASSPATH=".:$HOME/antlr-4.13.1-complete.jar:$CLASSPATH"
-alias antlr4='java -jar $HOME/antlr-4.13.1-complete.jar'
-alias grun='java org.antlr.v4.gui.TestRig'
-
-Recarga:
-
-source ~/.bashrc
-
-Prueba:
-
-antlr4
-
-Deberías ver el help del tool (como en la verificación de instalación). 
-
-04_LP
-
-2) Crear el proyecto
-mkdir -p ~/antlr-calc
-cd ~/antlr-calc
-3) Escribir la gramática (Cap. 4 – Calculadora con Visitor)
-
-Crea LabeledExpr.g4:
-
-nano LabeledExpr.g4
-
-Pega esto:
-
-grammar LabeledExpr;
-
-// parser rules
-prog:   stat+ ;
-
-stat
-    : expr NEWLINE                # printExpr
-    | ID '=' expr NEWLINE         # assign
-    | NEWLINE                     # blank
-    ;
-
-expr
-    : expr op=('*'|'/') expr      # MulDiv
-    | expr op=('+'|'-') expr      # AddSub
-    | INT                         # int
-    | ID                          # id
-    | '(' expr ')'                # parens
-    ;
-
-// lexer rules
-MUL : '*' ;
-DIV : '/' ;
-ADD : '+' ;
-SUB : '-' ;
-ID  : [a-zA-Z]+ ;
-INT : [0-9]+ ;
-NEWLINE:'\r'? '\n' ;
-WS  : [ \t]+ -> skip ;
